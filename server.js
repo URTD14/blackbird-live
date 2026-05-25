@@ -44,6 +44,16 @@ app.post('/subscribe', async (req, res) => {
   }
 });
 
+app.get('/admin', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, email, created_at FROM waitlist ORDER BY created_at DESC');
+    const rows = result.rows.map(r => `<tr><td>${r.id}</td><td>${r.email}</td><td>${r.created_at}</td></tr>`).join('');
+    res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Waitlist Admin</title><style>body{background:#F5ECD7;color:#2C2C2A;font-family:Georgia,'Times New Roman',serif;padding:40px 24px;max-width:700px;margin:0 auto}h1{font-size:28px;font-weight:700;margin-bottom:8px}.count{font-size:13px;opacity:0.6;margin-bottom:24px}table{width:100%;border-collapse:collapse;background:rgba(44,44,42,0.06);border-radius:12px;overflow:hidden}th,td{padding:12px 16px;text-align:left;font-size:13px}th{font-size:10px;text-transform:uppercase;letter-spacing:2px;opacity:0.45;font-weight:400;border-bottom:1px solid rgba(44,44,42,0.15)}td{border-bottom:1px solid rgba(44,44,42,0.06)}tr:last-child td{border-bottom:none}.empty{font-size:15px;opacity:0.5;text-align:center;padding:40px}a{color:#B04A1C;font-size:13px;text-decoration:none;display:inline-block;margin-top:24px}a:hover{text-decoration:underline}</style></head><body><h1>Waitlist</h1><div class="count">${rows.length} email${rows.length !== 1 ? 's' : ''}</div><table><thead><tr><th>ID</th><th>Email</th><th>Date</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="empty">No emails yet</td></tr>'}</tbody></table><a href="/">← Back to site</a></body></html>`);
+  } catch (err) {
+    res.status(500).send('Database error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
