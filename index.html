@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKBIRD — GST Invoicing, Simplified.</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --parchment: #F5ECD7;
+      --charcoal: #2C2C2A;
+      --rust: #B04A1C;
+      --card-bg: rgba(44, 44, 42, 0.06);
+      --border-subtle: rgba(44, 44, 42, 0.15);
+      --border-medium: rgba(44, 44, 42, 0.30);
+      --font: Georgia, 'Times New Roman', serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--parchment);
+      color: var(--charcoal);
+      font-family: var(--font);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .chrome {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--rust);
+      background: rgba(245, 236, 215, 0.92);
+      backdrop-filter: blur(4px);
+      letter-spacing: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      opacity: 0.85;
+    }
+
+    .chrome-rust {
+      color: var(--rust);
+    }
+
+    .hero {
+      position: relative;
+      height: 70vh;
+      min-height: 500px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(44, 44, 42, 0.60) 0%,
+        rgba(44, 44, 42, 0.30) 40%,
+        var(--parchment) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rust);
+      background: rgba(245, 236, 215, 0.15);
+      backdrop-filter: blur(4px);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(245, 236, 215, 0.20);
+    }
+
+    .hero-wordmark {
+      font-size: 80px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.05;
+      color: var(--parchment);
+      margin-bottom: 12px;
+      text-shadow: 0 2px 40px rgba(0, 0, 0, 0.30);
+    }
+
+    .hero-tagline {
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--parchment);
+      opacity: 0.7;
+      margin-bottom: 32px;
+      text-shadow: 0 1px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      color: var(--parchment);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.5;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    section {
+      padding: 80px 32px;
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .section-intro {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-intro .badge {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rust);
+      background: rgba(176, 74, 28, 0.12);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .section-intro h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--charcoal);
+    }
+
+    .split-content {
+      display: flex;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .split-content .left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .split-content .right {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .description {
+      font-size: 16px;
+      color: var(--charcoal);
+      opacity: 0.75;
+      line-height: 1.7;
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .feature {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .feature-icon {
+      font-size: 16px;
+      color: var(--rust);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .feature-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--charcoal);
+      opacity: 0.6;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      display: flex;
+      gap: 10px;
+      max-width: 420px;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      background: rgba(44, 44, 42, 0.05);
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--charcoal);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input::placeholder {
+      color: var(--charcoal);
+      opacity: 0.35;
+    }
+
+    .form-group input:focus {
+      border-color: var(--rust);
+    }
+
+    .form-group button {
+      padding: 13px 24px;
+      background: var(--charcoal);
+      color: var(--parchment);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .form-group button:hover {
+      background: #3A3A38;
+    }
+
+    .form-group button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin-top: 14px;
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    .message.success {
+      color: var(--rust);
+    }
+
+    .message.error {
+      color: var(--rust);
+      opacity: 0.7;
+    }
+
+    .video-card {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 40px rgba(44, 44, 42, 0.12),
+        0 2px 8px rgba(44, 44, 42, 0.06);
+      border: 1px solid var(--border-subtle);
+      background: #000;
+    }
+
+    .video-card video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .pillar {
+      margin-top: 40px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--charcoal);
+      opacity: 0.25;
+      text-transform: lowercase;
+      text-align: center;
+    }
+
+    @media (max-width: 800px) {
+      .hero-wordmark {
+        font-size: 48px;
+      }
+
+      .hero-tagline {
+        font-size: 20px;
+      }
+
+      .split-content {
+        flex-direction: column-reverse;
+        gap: 40px;
+      }
+
+      .split-content .left {
+        text-align: center;
+      }
+
+      .description {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .form-group {
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto 32px;
+      }
+
+      section {
+        padding: 60px 20px;
+      }
+
+      .chrome {
+        padding: 12px 16px;
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-group {
+        flex-direction: column;
+      }
+
+      .form-group button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chrome">
+    <span>BLACKBIRD</span>&nbsp;<span class="chrome-rust">●</span>
+  </div>
+
+  <div class="hero">
+    <video src="BlackbirdDemo30.mp4" muted autoplay loop playsinline></video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Coming Soon</div>
+      <h1 class="hero-wordmark">BLACKBIRD</h1>
+      <p class="hero-tagline">GST. Invoices. Done.</p>
+    </div>
+    <div class="scroll-indicator">Scroll to learn more</div>
+  </div>
+
+  <section>
+    <div class="container">
+      <div class="section-intro">
+        <div class="badge">See it in action</div>
+        <h2>One dashboard, full control</h2>
+      </div>
+
+      <div class="split-content">
+        <div class="left">
+          <p class="description">
+            Manage invoices and GST compliance from a single place.
+            Auto-calculates CGST, SGST, and total — so you never miss a filing.
+          </p>
+
+          <div class="features">
+            <div class="feature">
+              <div class="feature-icon">✦</div>
+              <div class="feature-title">Invoice Management</div>
+              <div class="feature-desc">Create, track, and manage all invoices from one place.</div>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">✦</div>
+              <div class="feature-title">Auto GST</div>
+              <div class="feature-desc">CGST, SGST, IGST calculated automatically. Zero errors.</div>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">✦</div>
+              <div class="feature-title">Compliance Ready</div>
+              <div class="feature-desc">Know your liability at a glance. File GSTR-1 with ease.</div>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">✦</div>
+              <div class="feature-title">GSTR-1 Filing</div>
+              <div class="feature-desc">File returns directly from the dashboard.</div>
+            </div>
+          </div>
+
+          <form id="waitlist-form" class="form-group" netlify name="waitlist">
+            <input type="email" id="email" placeholder="Enter your email" required autocomplete="email" />
+            <button type="submit" id="submit-btn">Join Waitlist</button>
+          </form>
+          <div id="message" class="message"></div>
+        </div>
+
+        <div class="right">
+          <div class="video-card">
+            <video src="BlackbirdDemo30.mp4" controls playsinline poster></video>
+          </div>
+        </div>
+      </div>
+
+      <div class="pillar">gst . invoices . compliance . india</div>
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      var form = document.getElementById('waitlist-form');
+      var emailInput = document.getElementById('email');
+      var submitBtn = document.getElementById('submit-btn');
+      var messageEl = document.getElementById('message');
+
+      function showMessage(text, type) {
+        messageEl.textContent = text;
+        messageEl.className = 'message ' + type;
+      }
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = emailInput.value.trim();
+
+        if (!email) {
+          showMessage('Please enter your email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        if (!isValidEmail(email)) {
+          showMessage('Please enter a valid email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting…';
+
+        var existing = [];
+        try {
+          var raw = localStorage.getItem('blackbird_waitlist');
+          if (raw) existing = JSON.parse(raw);
+          if (!Array.isArray(existing)) existing = [];
+        } catch (_) {
+          existing = [];
+        }
+
+        if (existing.indexOf(email) !== -1) {
+          showMessage('You are already on the waitlist!', 'success');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Join Waitlist';
+          return;
+        }
+
+        existing.push(email);
+        try {
+          localStorage.setItem('blackbird_waitlist', JSON.stringify(existing));
+        } catch (_) {
+          showMessage('Could not save. Storage may be full.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Join Waitlist';
+          return;
+        }
+
+        showMessage('You\'re on the list. We\'ll be in touch.', 'success');
+        emailInput.value = '';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join Waitlist';
+      });
+    })();
+  </script>
+</body>
+</html>
