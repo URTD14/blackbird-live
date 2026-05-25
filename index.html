@@ -447,7 +447,7 @@
             </div>
           </div>
 
-          <form id="waitlist-form" class="form-group" netlify name="waitlist">
+          <form id="waitlist-form" class="form-group">
             <input type="email" id="email" placeholder="Enter your email" required autocomplete="email" />
             <button type="submit" id="submit-btn">Join Waitlist</button>
           </form>
@@ -481,7 +481,7 @@
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', async function(e) {
         e.preventDefault();
         var email = emailInput.value.trim();
 
@@ -500,34 +500,19 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting…';
 
-        var existing = [];
         try {
-          var raw = localStorage.getItem('blackbird_waitlist');
-          if (raw) existing = JSON.parse(raw);
-          if (!Array.isArray(existing)) existing = [];
+          var res = await fetch('/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email }),
+          });
+          var data = await res.json();
+          showMessage(data.message || data.error, res.ok ? 'success' : 'error');
+          if (res.ok) emailInput.value = '';
         } catch (_) {
-          existing = [];
+          showMessage('Could not connect. Please try again.', 'error');
         }
 
-        if (existing.indexOf(email) !== -1) {
-          showMessage('You are already on the waitlist!', 'success');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Join Waitlist';
-          return;
-        }
-
-        existing.push(email);
-        try {
-          localStorage.setItem('blackbird_waitlist', JSON.stringify(existing));
-        } catch (_) {
-          showMessage('Could not save. Storage may be full.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Join Waitlist';
-          return;
-        }
-
-        showMessage('You\'re on the list. We\'ll be in touch.', 'success');
-        emailInput.value = '';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Join Waitlist';
       });
