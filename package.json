@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server.js"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "express": "^4.21.0",
     "pg": "^8.13.0"
   }

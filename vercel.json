@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/subscribe", "destination": "/api/subscribe" },
+    { "source": "/admin/export", "destination": "/api/admin-export" },
+    { "source": "/admin", "destination": "/api/admin" }
+  ]
+}
